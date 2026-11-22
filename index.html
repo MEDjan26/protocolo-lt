@@ -258,6 +258,56 @@ tr.soon td{background:var(--warn-soft)}
 .brand b{white-space:nowrap}
 @media (max-width:440px){.brand span{display:none}.top img{width:32px;height:32px}}
 
+/* tutorial em destaque */
+.ttop{display:inline-flex;align-items:center;gap:6px;background:#C9A227;color:#1B1503;border:0;border-radius:999px;padding:6px 12px 6px 8px;font-weight:700;font-size:.82rem;cursor:pointer;min-height:34px}
+.ttop svg{width:20px;height:20px;stroke:#1B1503}
+.ttop:hover{filter:brightness(1.08)}
+@media (max-width:440px){.ttop span{display:none}.ttop{padding:6px}}
+.tut{background:var(--head);color:var(--head-fg);border-radius:14px;padding:18px;display:grid;grid-template-columns:1fr;gap:16px;align-items:center;border:2px solid #C9A227}
+@media (min-width:900px){.tut{grid-template-columns:minmax(0,5fr) minmax(0,7fr);padding:22px}}
+.tut-h{display:flex;flex-direction:column;gap:8px;min-width:0}
+.tut-h h2{font-size:1.35rem;color:#fff}
+.tut-h p{margin:0;color:#BFDCE1;font-size:.92rem;max-width:52ch}
+.tag{align-self:flex-start;display:inline-block;background:#C9A227;color:#1B1503;font-weight:800;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 10px;border-radius:999px}
+.vid{position:relative;border-radius:10px;overflow:hidden;background:#000;aspect-ratio:16/9;max-width:100%;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.vid video{width:100%;height:100%;display:block;background:#000}
+.vplay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(4,25,30,.35);border:0;cursor:pointer;color:#fff}
+.vplay:hover .vbtn{transform:scale(1.06)}
+.vbtn{width:84px;height:84px;border-radius:50%;background:#C9A227;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 10px rgba(201,162,39,.3);transition:transform .15s}
+.vbtn svg{width:46px;height:46px;stroke:#1B1503;fill:#1B1503;margin-left:4px}
+.vbtn svg circle{display:none}
+.vtxt{display:flex;flex-direction:column;align-items:center;background:rgba(4,25,30,.75);padding:6px 14px;border-radius:8px}
+.vtxt b{font-size:1.05rem} .vtxt small{font-size:.78rem;color:#cfe6ea}
+@media (max-width:480px){.vbtn{width:64px;height:64px}.vbtn svg{width:34px;height:34px}}
+.vfall{display:none;margin:6px 0 0;color:inherit}.vfall.on{display:block}
+.tut .vfall a{color:#F2D16B}
+.go{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media (min-width:760px){.go{grid-template-columns:repeat(4,1fr)}}
+.gostep{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:14px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);text-decoration:none;color:var(--fg);cursor:pointer;text-align:left;font:inherit}
+.gostep:hover{border-color:var(--teal)}
+.gostep svg{width:26px;height:26px;stroke:var(--teal-ink)}
+.gostep b{font-size:.95rem} .gostep small{color:var(--muted);font-size:.8rem}
+.gn{position:absolute;top:10px;right:12px;font-family:var(--mono);font-size:.78rem;color:var(--gold);font-weight:700}
+.path.two{grid-template-columns:repeat(2,1fr)!important}
+@media (min-width:640px){.path.two{grid-template-columns:repeat(3,1fr)!important}}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(2,14,17,.72);display:flex;align-items:center;justify-content:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet{background:var(--surface);color:var(--fg);border-radius:14px;padding:18px;width:min(860px,100%);max-height:100%;overflow:auto;border:2px solid #C9A227}
+.vbtn svg{width:40px;height:40px;fill:#1B1503;stroke:none;margin-left:6px}
+@media (max-width:480px){.vbtn svg{width:30px;height:30px}}
+@media (max-width:600px){
+  .hero{padding:14px 16px;gap:12px;flex-wrap:nowrap;align-items:flex-start}
+  .hero img{width:52px;height:52px;border-radius:12px}
+  .hero h1{font-size:1.15rem}
+  .hero p{font-size:.8rem}
+  .hero::after{display:none}
+  .tut{padding:14px}
+  .tut-h h2{font-size:1.15rem}
+  .pchip{max-width:32vw}
+}
+@media (max-width:440px){.ttop span{display:inline}.ttop{padding:6px 10px 6px 6px}}
+@media (max-width:360px){.ttop span{display:none}}
+.sheet .row:first-child{flex-wrap:nowrap}
+
 </style>
 <script>window.LT_SW=true;</script>
 </head><body>
@@ -618,6 +668,7 @@ function shell(){
     <img src="${CONTENT.icon}" alt="">
     <div class="brand"><b>Protocolo LT</b><span>Leishmaniose tegumentar</span></div>
     <div class="sp"></div><span class="saved" id="saved">✓ salvo</span>
+    <button class="ttop" id="ttop" type="button">${ic('play')}<span>Tutorial</span></button>
     <button class="pchip" id="pchip" type="button"></button>
   </header>
   <div class="shell">
@@ -625,7 +676,7 @@ function shell(){
     <main id="main"></main>
   </div>
   <nav class="tabs" aria-label="Atalhos">${TABS.map(x=>`<a href="#${x[0]}" data-v="${x[0]}">${ic(x[2])}${x[1]}</a>`).join('')}</nav>`;
-  $('#pchip').onclick=()=>go('pacientes');
+  $('#pchip').onclick=()=>go('pacientes');$('#ttop').onclick=openTut;
 }
 function render(){
   const v=view();
@@ -698,6 +749,14 @@ function bindForm(root,obj,defs,onchange){
 
 /* ---------- views ---------- */
 const V={},AFTER={};
+function videoBlock(id){
+  return `<div class="vid" id="${id}"><video id="${id}_v" playsinline preload="none" poster="tutorial-capa.jpg"><source src="tutorial.mp4" type="video/mp4"></video>
+    <button class="vplay" type="button" data-vplay="${id}" aria-label="Assistir ao tutorial"><span class="vbtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg></span><span class="vtxt"><b>Assistir ao tutorial</b><small>4 min 53 s · com narração</small></span></button></div>
+    <p class="hint vfall">Se o vídeo não carregar, <a href="${DRIVE}" target="_blank" rel="noopener">abra pelo Google Drive</a>.</p>`;
+}
+function bindVideo(){document.querySelectorAll('[data-vplay]').forEach(b=>b.onclick=()=>{const v=document.getElementById(b.dataset.vplay+'_v');b.hidden=true;v.controls=true;try{const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}
+  try{localStorage.setItem('protocoloLT.viu','1');}catch(e){} });
+  document.querySelectorAll('.vid video').forEach(v=>{v.onerror=()=>{const f=v.closest('.vid').nextElementSibling;if(f)f.classList.add('on');};const s=v.querySelector('source');if(s)s.onerror=v.onerror;v.onplay=()=>{const b=v.parentNode.querySelector('.vplay');if(b)b.hidden=true;};});}
 V.inicio=()=>{
   const rp=realPatients(); const t=today(), t7=addD(t,7);
   let emTrat=0,ret7=0,ref=0; const soon=[];
@@ -705,8 +764,11 @@ V.inicio=()=>{
   S.patients.forEach(p=>{const r=calc(p);if(r.prox&&r.prox<=addD(t,14))soon.push([p,r.prox]);});
   soon.sort((a,b)=>a[1]-b[1]);
   const steps=[['1','Suspeita','lesão ≥3 semanas','protocolo'],['2','Exame','direto / Montenegro','cadastro'],['3','Notificação','SINAN','cadastro'],['4','Tratamento','calculadora','dose'],['5','Seguimento','agenda de retornos','agenda'],['6','Alta','critério de cura','consulta']];
-  return `<section class="hero"><img src="${CONTENT.icon}" alt="Ícone do Protocolo LT"><div class="t"><div class="eyebrow">Protocolo digital</div><h1>Leishmaniose tegumentar, do diagnóstico à alta</h1><p>Conforme o Manual de Vigilância da Leishmaniose Tegumentar (Ministério da Saúde, 2017). Edjan S. Santos · Interno de Medicina UFAC · Turma 30 · Internato Rural, Feijó (AC).</p></div></section>
-  <section class="panel"><h2>Percurso do paciente</h2><div class="path">${steps.map(s=>`<a class="step" href="#${s[3]}"><span class="n">${s[0]}</span><b>${s[1]}</b><small>${s[2]}</small></a>`).join('')}</div></section>
+  const start=[['play','Assista ao vídeo','5 minutos, explica tudo','#tutorial'],['plus','Cadastre o paciente','uma vez, com botões','novo'],['steth','Registre a consulta','a cada atendimento','#consulta'],['text','Copie o SOAP','e cole no PEC','#soap']];
+  return `<section class="hero"><img src="${CONTENT.icon}" alt="Ícone do Protocolo LT"><div class="t"><div class="eyebrow">Protocolo digital</div><h1>Leishmaniose tegumentar, do diagnóstico à alta</h1><p>Manual de Vigilância da Leishmaniose Tegumentar (Ministério da Saúde, 2017) · Edjan S. Santos, Interno de Medicina UFAC, Turma 30 · Internato Rural, Feijó (AC)</p></div></section>
+  <section class="tut" id="tutorial"><div class="tut-h"><span class="tag">Comece por aqui</span><h2>Primeira vez? Assista ao tutorial antes de usar</h2><p>Em 5 minutos o vídeo mostra cada parte do protocolo: cadastro, consultas, dose, SOAP, ficha e agenda. As telas do aplicativo seguem os mesmos passos.</p></div>${videoBlock('vh')}</section>
+  <section class="panel"><h2>Como usar em 4 passos</h2><div class="go">${start.map((x,i)=>x[3]==='novo'?`<button class="gostep" id="novo" type="button"><span class="gn">${i+1}</span>${ic(x[0])}<b>${x[1]}</b><small>${x[2]}</small></button>`:`<a class="gostep" href="${x[3]}" ${x[3]==='#tutorial'?'data-scroll="tutorial"':''}><span class="gn">${i+1}</span>${ic(x[0])}<b>${x[1]}</b><small>${x[2]}</small></a>`).join('')}</div>
+    <p class="hint" style="margin:12px 0 0">Tudo o que você digita é salvo na hora, neste aparelho. Os dados dos pacientes não vão para a internet.</p></section>
   <section class="panel"><h2>Painel da unidade</h2><div class="stats">
     <div class="stat"><b>${rp.length}</b><span>pacientes cadastrados</span></div>
     <div class="stat"><b>${emTrat}</b><span>em tratamento agora</span></div>
@@ -715,16 +777,11 @@ V.inicio=()=>{
     <p class="hint" style="margin:10px 0 0">O paciente exemplo LT-999 não entra nas contas.</p></section>
   <div class="grid2">
    <section class="panel"><h2>Próximas datas (14 dias)</h2>${soon.length?`<div class="list">${soon.map(([p,d])=>`<button class="item" data-open="${p.id}"><span class="code">${code(p.id)}</span><span class="nm">${esc(p.nome||'sem nome')}</span><span class="pill t num">${fd(d)}</span></button>`).join('')}</div>`:'<div class="empty">Nenhum retorno marcado nos próximos 14 dias.</div>'}</section>
-   <section class="panel"><h2>Atalhos</h2><div class="row">
-     <button class="btn pri" id="novo">${ic('plus')}Novo paciente</button>
-     <a class="btn" href="#consulta">${ic('steth')}Registrar consulta</a>
-     <a class="btn" href="#soap">${ic('text')}Texto SOAP</a>
-     <a class="btn" href="${DRIVE}" target="_blank" rel="noopener">${ic('play')}Vídeo tutorial</a></div>
-     <p class="hint" style="margin:12px 0 0">Tudo o que você digita é salvo na hora, neste aparelho. Os dados dos pacientes não vão para a internet.</p></section>
+   <section class="panel"><h2>Percurso do paciente</h2><div class="path two">${steps.map(s=>`<a class="step" href="#${s[3]}"><span class="n">${s[0]}</span><b>${s[1]}</b><small>${s[2]}</small></a>`).join('')}</div></section>
   </div>
   <p class="ftr">Apoio à decisão: a conduta final é do médico responsável e a ficha SINAN continua obrigatória.</p>`;
 };
-AFTER.inicio=()=>{bindOpen();const n=$('#novo');if(n)n.onclick=novoPaciente;};
+AFTER.inicio=()=>{bindOpen();bindVideo();const n=$('#novo');if(n)n.onclick=novoPaciente;document.querySelectorAll('[data-scroll]').forEach(a=>a.onclick=e=>{e.preventDefault();const el=document.getElementById(a.dataset.scroll);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});});};
 function bindOpen(){document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{S.sel=+b.dataset.open;save();go(b.dataset.go||'resumo');});}
 function novoPaciente(){const ids=realPatients().map(p=>p.id);const id=(ids.length?Math.max(...ids):0)+1;
   S.patients.push({id,d1:iso(today()),created:Date.now()});S.sel=id;save();go('cadastro');toast('Paciente '+code(id)+' criado. Preencha os campos.');}
@@ -910,7 +967,7 @@ V.referencias=()=>`<div><h1>Referências</h1></div><div class="card-k">${CONTENT
   <h2>Onde está no manual</h2><div class="tw"><table><thead><tr><th>Assunto</th><th>Página(s)</th></tr></thead><tbody>${CONTENT.referencias.slice(4).filter(r=>r[2]&&r[0]!=='Assunto').map(r=>`<tr><td>${esc(r[0])}</td><td class="d">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>
   <p class="hint">Versão do aplicativo 1.0 · novembro de 2026 · mesmas regras da planilha LT-Protocolo-Digital-Santos-2026.</p>`;
 V.ajuda=()=>`<div><h1>Como usar</h1><p class="lead">O aplicativo faz o mesmo que a planilha, com botões no lugar dos números.</p></div>
-  <section class="panel"><h2>Vídeo tutorial</h2><p style="margin:0 0 10px">O vídeo mostra o protocolo passo a passo, na versão planilha. As telas do aplicativo seguem a mesma lógica.</p><a class="btn pri" href="${DRIVE}" target="_blank" rel="noopener">${ic('play')}Assistir ao tutorial (abre no navegador)</a></section>
+  <section class="tut"><div class="tut-h"><span class="tag">Vídeo tutorial</span><h2>Aprenda em 5 minutos</h2><p>O vídeo mostra o protocolo passo a passo. As telas do aplicativo seguem os mesmos passos.</p></div>${videoBlock('va')}</section>
   <section class="panel prose"><h2>Passo a passo com paciente novo</h2>
    <p><b>1. Pacientes › Novo paciente.</b> O código (LT-001, LT-002…) sai sozinho. Preencha o cadastro uma vez. O quadro “Resultado do protocolo” mostra tratamento, dose, encaminhamento e alertas na hora.</p>
    <p><b>2. Consultas › Nova consulta</b> a cada atendimento. O quadro “Alerta do manual” avisa quando suspender, notificar reação, indicar 2º esquema ou dar critério de cura.</p>
@@ -928,6 +985,7 @@ V.ajuda=()=>`<div><h1>Como usar</h1><p class="lead">O aplicativo faz o mesmo que
    <p>Para mandar informação a alguém, envie só a ficha em PDF daquele paciente e só para quem cuida dele. CPF e nome da mãe não são necessários aqui.</p></section>
   <section class="panel prose"><h2>Aviso</h2><p>${esc(CONTENT.aviso)}</p></section>`;
 
+AFTER.ajuda=()=>bindVideo();
 V.dados=()=>{const n=realPatients().length;let used='';try{used=Math.round((localStorage.getItem(KEY)||'').length/1024)+' KB';}catch(e){}
   return `<div><h1>Dados e backup</h1><p class="lead">${n} paciente(s) e ${S.consults.filter(c=>c.cod!==999).length} consulta(s) guardados neste aparelho${used?' ('+used+')':''}.</p></div>
   ${window.LT_SW?'':'<div class="box y"><b class="lbl">Versão de teste</b>Nesta página de teste, baixar e importar arquivos e imprimir não funcionam. No aplicativo instalado e no arquivo do notebook funcionam.</div>'}
@@ -947,10 +1005,18 @@ function merge(ps,cs){let np=0,nc=0;ps.forEach(p=>{if(!isNum(p.id))return;const 
   cs.forEach(c=>{if(!isNum(c.cod))return;const dup=S.consults.find(x=>x.cod===c.cod&&x.data===c.data&&x.tipo===c.tipo&&(x.conduta||'')===(c.conduta||''));if(dup)return;c.uid=c.uid||Date.now()+Math.random();S.consults.push(c);nc++;});return{np,nc};}
 function download(name,bytes,type){const b=new Blob([bytes],{type});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);toast('Arquivo '+name+' gerado.');}
 
-V.mais=()=>`<h1>Mais</h1>${NAV.map(g=>`<section class="panel" style="padding:6px 12px"><div class="hint" style="padding:8px 4px 2px;text-transform:uppercase;letter-spacing:.08em">${g[0]}</div><div class="list">${g[1].map(x=>`<a class="item" href="#${x[0]}" style="text-decoration:none;color:inherit;grid-template-columns:auto 1fr">${ic(x[2])}<span class="nm">${x[1]}</span></a>`).join('')}</div></section>`).join('')}`;
+V.mais=()=>`<h1>Mais</h1><button class="btn pri" id="mtut" type="button" style="align-self:flex-start">${ic('play')}Assistir ao tutorial</button>${NAV.map(g=>`<section class="panel" style="padding:6px 12px"><div class="hint" style="padding:8px 4px 2px;text-transform:uppercase;letter-spacing:.08em">${g[0]}</div><div class="list">${g[1].map(x=>`<a class="item" href="#${x[0]}" style="text-decoration:none;color:inherit;grid-template-columns:auto 1fr">${ic(x[2])}<span class="nm">${x[1]}</span></a>`).join('')}</div></section>`).join('')}`;
 
+function openTut(){let m=$('#tutm');if(m)m.remove();m=document.createElement('div');m.id='tutm';m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label','Tutorial em vídeo');
+  const first=!seen();
+  m.innerHTML=`<div class="sheet"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${first?'Bem-vindo':'Tutorial'}</span><h2 style="margin-top:6px">${first?'Antes de começar, assista ao tutorial':'Tutorial em vídeo'}</h2><p class="lead" style="margin-top:4px">Em 5 minutos você aprende a cadastrar, registrar consultas, calcular a dose, copiar o SOAP e imprimir a ficha.</p></div><button class="btn sm" id="tutx" type="button" aria-label="Fechar">Fechar</button></div>${videoBlock('vm')}<div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn pri" id="tutok" type="button">${first?'Já assisti, começar':'Voltar ao aplicativo'}</button></div></div>`;
+  document.body.appendChild(m);bindVideo();const close=()=>{try{localStorage.setItem('protocoloLT.viu','1');}catch(e){}const v=m.querySelector('video');if(v)v.pause();m.remove();};
+  $('#tutx').onclick=close;$('#tutok').onclick=close;m.onclick=e=>{if(e.target===m)close();};document.addEventListener('keydown',function k(e){if(e.key==='Escape'){close();document.removeEventListener('keydown',k);}});$('#tutx').focus();}
+function seen(){try{return localStorage.getItem('protocoloLT.viu')==='1';}catch(e){return true;}}
+AFTER.mais=()=>{$('#mtut').onclick=openTut;};
 /* ---------- início ---------- */
 function boot(){load();shell();window.addEventListener('hashchange',()=>{editC=editC;render();});render();
+  if(!seen()&&!window.LT_NOMODAL)setTimeout(openTut,400);
   try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
   try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&window.LT_SW)navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 }
