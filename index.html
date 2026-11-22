@@ -151,7 +151,7 @@ svg.i{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke
 
 /* formulário */
 .sec{display:flex;flex-direction:column;gap:12px}
-.sec>h3{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-ink);padding-top:6px;border-top:1px solid var(--line);padding-top:14px}
+.sec>h3,.sech>h3{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--teal-ink);padding-top:6px;border-top:1px solid var(--line);padding-top:14px}
 .sec:first-child>h3{border-top:0;padding-top:0}
 .fgrid{display:grid;grid-template-columns:1fr;gap:12px 14px}
 @media (min-width:620px){.fgrid{grid-template-columns:1fr 1fr}}
@@ -307,6 +307,35 @@ tr.soon td{background:var(--warn-soft)}
 @media (max-width:440px){.ttop span{display:inline}.ttop{padding:6px 10px 6px 6px}}
 @media (max-width:360px){.ttop span{display:none}}
 .sheet .row:first-child{flex-wrap:nowrap}
+/* automações e atalhos */
+[hidden]{display:none!important}
+.sech{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
+.sec:first-child .sech{border-top:0;padding-top:0}
+.sech>h3{border:0!important;padding:0!important;margin:0}
+.qrow{display:flex;gap:6px;flex-wrap:wrap}
+.btn.quick{border-color:var(--teal);color:var(--teal-ink);background:var(--teal-soft);font-weight:600}
+.btn.pri.quick{background:var(--teal);color:#fff}
+:root[data-theme="dark"] .btn.pri.quick{color:#04191E}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.pri.quick{color:#04191E}}
+.prog{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:thin}
+.prog a{flex:none;display:flex;align-items:center;gap:6px;padding:6px 12px 6px 6px;border:1px solid var(--line);border-radius:999px;background:var(--surface);text-decoration:none;color:var(--fg);font-size:.84rem;font-weight:600}
+.prog .pn{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--muted);font-size:.74rem}
+.prog small{color:var(--muted);font-weight:500;font-family:var(--mono);font-size:.72rem}
+.prog a.mid .pn{background:var(--gold-soft);color:var(--gold)}
+.prog a.ok{border-color:var(--teal);background:var(--teal-soft);color:var(--teal-ink)}
+.prog a.ok .pn{background:var(--teal);color:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{border:1px dashed var(--teal);background:transparent;color:var(--teal-ink);border-radius:999px;padding:5px 11px;font-size:.82rem;cursor:pointer;min-height:32px}
+.chip:hover{background:var(--teal-soft)}
+.chip:active{transform:scale(.97)}
+.fabres{position:fixed;right:16px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:11px 16px;background:var(--head,#062F38);color:#fff;font-weight:700;font-size:.88rem;box-shadow:0 6px 18px rgba(0,0,0,.25);cursor:pointer}
+.fabres svg{width:18px;height:18px;stroke:#fff}
+@media (min-width:900px){.fabres{bottom:22px}}
+@media (min-width:1100px){.fabres{display:none}}
+@media print{.fabres,.prog,.chips{display:none!important}}
+.saved1{animation:pop .35s ease}
+@keyframes pop{from{transform:translateY(-6px);opacity:0}to{transform:none;opacity:1}}
+@media (max-width:600px){.top .saved{display:none}}
 
 </style>
 <script>window.LT_SW=true;</script>
@@ -692,7 +721,7 @@ function picker(id,label){
   const opts=S.patients.slice().sort((a,b)=>a.id-b.id).map(p=>`<option value="${p.id}" ${p.id===S.sel?'selected':''}>${code(p.id)} – ${esc(p.nome||'sem nome')}${p.id===999?' (exemplo)':''}</option>`).join('');
   return `<div class="picker noprint"><label for="${id}" class="hint">${label||'Paciente'}</label><select id="${id}" data-pick>${S.sel==null?'<option value="">Escolha…</option>':''}${opts}</select></div>`;
 }
-function bindPick(){document.querySelectorAll('[data-pick]').forEach(s=>s.onchange=()=>{S.sel=+s.value||null;save();render();});}
+function bindPick(){document.querySelectorAll('[data-pick]').forEach(s=>s.onchange=()=>{S.sel=+s.value||null;editC=null;justSaved=null;save();render();});}
 function alertList(a,empty){return a.length?`<ul class="al">${a.map(x=>`<li>${pg(x)}</li>`).join('')}</ul>`:`<span>${empty||'Nenhum alerta.'}</span>`;}
 function resultBox(p){
   const r=calc(p);
@@ -729,16 +758,16 @@ const CF=[
  ['Lesão',[['diam','Maior diâmetro da lesão (cm)','n'],['epit','Epitelização','o','epit'],['crosta','Crosta/descamação/infiltração/eritema','o','sn'],['piora','Piora ou lesão nova','o','sn']]],
  ['Plano',[['conduta','Conduta / prescrição','a',1],['retorno','Próximo retorno','d']]]
 ];
-function fieldHTML(pre,obj,f,calcv){
-  const [k,l,t,x,w]=f; const id=pre+'_'+k; const wide=(t==='o'?w:x)?' w':'';
-  if(t==='c') return `<div class="f"><span class="lb">${l}</span><div class="calcv" id="${id}">${esc(calcv[k]||'—')}</div></div>`;
-  if(t==='o') return `<div class="f${wide}"><span class="lb" id="${id}_l">${l}</span><div class="seg" role="group" aria-labelledby="${id}_l">${OPT[x].map((o,i)=>`<button type="button" data-k="${k}" data-v="${i+1}" aria-pressed="${obj[k]===i+1}">${o}</button>`).join('')}</div></div>`;
+function fieldHTML(pre,obj,f,calcv,X){
+  const [k,l,t,x,w]=f; const id=pre+'_'+k; const wide=(t==='o'?w:x)?' w':'';const aft=(X&&X.after&&X.after[k])||'';
+  if(t==='c') return `<div class="f" data-f="${k}"><span class="lb">${l}</span><div class="calcv" id="${id}">${esc(calcv[k]||'—')}</div></div>`;
+  if(t==='o') return `<div class="f${wide}" data-f="${k}"><span class="lb" id="${id}_l">${l}</span><div class="seg" role="group" aria-labelledby="${id}_l">${OPT[x].map((o,i)=>`<button type="button" data-k="${k}" data-v="${i+1}" aria-pressed="${obj[k]===i+1}">${o}</button>`).join('')}</div>${aft}</div>`;
   const v=obj[k]==null?'':obj[k];
-  if(t==='a') return `<div class="f${wide}"><label for="${id}">${l}</label><textarea id="${id}" data-k="${k}">${esc(v)}</textarea></div>`;
+  if(t==='a') return `<div class="f${wide}" data-f="${k}"><label for="${id}">${l}</label><textarea id="${id}" data-k="${k}">${esc(v)}</textarea>${aft}</div>`;
   const type=t==='d'?'date':t==='n'?'number':t==='tel'?'tel':'text';
-  return `<div class="f${wide}"><label for="${id}">${l}</label><input id="${id}" data-k="${k}" type="${type}" ${t==='n'?'inputmode="decimal" step="any"':''} value="${esc(v)}"></div>`;
+  return `<div class="f${wide}" data-f="${k}"><label for="${id}">${l}</label><input id="${id}" data-k="${k}" type="${type}" ${t==='n'?'inputmode="decimal" step="any"':''} value="${esc(v)}">${aft}</div>`;
 }
-function formHTML(pre,obj,defs,calcv){return defs.map(s=>`<section class="sec"><h3>${s[0]}</h3><div class="fgrid">${s[1].map(f=>fieldHTML(pre,obj,f,calcv)).join('')}</div></section>`).join('');}
+function formHTML(pre,obj,defs,calcv,X){return defs.map((s,i)=>`<section class="sec" id="${pre}_s${i}"><div class="sech"><h3>${s[0]}</h3>${(X&&X.sec&&X.sec[i])||''}</div><div class="fgrid">${s[1].map(f=>fieldHTML(pre,obj,f,calcv,X)).join('')}</div></section>`).join('');}
 function bindForm(root,obj,defs,onchange){
   const types={};defs.forEach(s=>s[1].forEach(f=>types[f[0]]=f[2]));
   root.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{const k=b.dataset.k,v=+b.dataset.v;obj[k]=obj[k]===v?null:v;
@@ -746,6 +775,60 @@ function bindForm(root,obj,defs,onchange){
   root.querySelectorAll('input[data-k],textarea[data-k]').forEach(i=>i.oninput=()=>{const k=i.dataset.k;let v=i.value;
     if(types[k]==='n'){v=v===''?null:parseFloat(String(v).replace(',','.'));if(!isFinite(v))v=null;}else if(v==='')v=null;obj[k]=v;onchange(k);});
 }
+/* reflete no formulário o que foi preenchido automaticamente */
+function syncForm(root,obj){
+  root.querySelectorAll('.seg button').forEach(b=>b.setAttribute('aria-pressed',obj[b.dataset.k]===+b.dataset.v));
+  root.querySelectorAll('input[data-k],textarea[data-k]').forEach(i=>{if(i!==document.activeElement){const v=obj[i.dataset.k];i.value=v==null?'':v;}});
+}
+function showIf(root,rules){Object.keys(rules).forEach(k=>{const el=root.querySelector('[data-f="'+k+'"]');if(el)el.hidden=!rules[k];});}
+
+/* ---------- automações do cadastro ---------- */
+const PREQ=[['nome','nasc','sexo','peso'],['forma','nles','diam','local','evol','mucosa','guy'],['comorb','dm','hiv','imuno','qt','audit'],['direto','idrm','histo','notif'],['droga','inicio'],['sit']];
+const SECN=['Identificação','Lesão','Comorbidades','Diagnóstico','Tratamento','Situação'];
+function preq(p,i){const l=PREQ[i].slice();if(i===0&&p.sexo===2)l.push('gest','lact');return l;}
+function progHTML(p){return `<nav class="prog" aria-label="Partes do cadastro">${SECN.map((n,i)=>{const l=preq(p,i),f=l.filter(k=>p[k]!=null&&p[k]!=='').length,ok=f===l.length||(i===3&&p.notif!=null&&(p.direto!=null||p.idrm!=null||p.histo!=null));
+  return `<a href="#" data-sec="p_s${i}" class="${ok?'ok':f?'mid':''}"><span class="pn">${ok?'✓':i+1}</span><span>${n}</span>${ok?'':`<small>${f}/${l.length}</small>`}</a>`;}).join('')}</nav>`;}
+function pRules(p){return {gest:p.sexo!==1,lact:p.sexo!==1,dnotif:p.notif===1,nsinan:p.notif===1,dEnc:isNum(p.sit)&&p.sit>=4,fimReal:!!p.inicio};}
+function autoP(p,k){const a=calc(p).idade;const out=isNum(a)&&(a<10||a>=50);
+  if(k==='sexo'){if(p.sexo===1){p.gest=3;p.lact=2;}else{if(p.gest===3&&!out)p.gest=null;}}
+  if((k==='sexo'||k==='nasc')&&p.sexo===2&&out&&p.gest==null)p.gest=3;
+  if(k==='notif'&&p.notif===1&&!p.dnotif)p.dnotif=iso(today());
+  if(k==='inicio'&&p.inicio&&(p.sit==null||p.sit===1))p.sit=2;
+  if(k==='sit'&&isNum(p.sit)&&p.sit>=4&&!p.dEnc)p.dEnc=iso(today());
+}
+/* droga correspondente ao tratamento indicado pelo manual (null = decidir no centro de referência) */
+function drogaDe(t){if(!t)return null;if(t.startsWith('Pentamidina contraindicada'))return null;
+  if(t.startsWith('Anfotericina B lipossomal'))return 4;if(t.startsWith('Desoxicolato'))return 5;if(t.startsWith('Pentamidina'))return 3;
+  if(/\+ pentoxifilina/.test(t))return 6;if(t.startsWith('Antimoniato')||t.startsWith('Área L. guyanensis'))return 1;return null;}
+
+/* ---------- automações da consulta ---------- */
+function tipoAuto(p,c){const r=calc(p),A=pd(c.data),ini=pd(p.inicio);if(!A||!ini||A<ini)return 1;
+  if(diff(A,ini)===0)return 2;if(!r.fim||A<r.fim)return 3;if(diff(A,r.fim)===0)return 4;return 5;}
+function retornoAuto(p,c){const r=calc(p),A=pd(c.data);if(!A)return null;if([5,8,9,10].includes(p.sit))return null;
+  const n=r.agenda.map(x=>x.d).filter(d=>d>A).sort((x,y)=>x-y)[0];return n?iso(n):null;}
+function novaConsulta(p){const c={uid:Date.now(),cod:p.id,data:iso(today())};const lc=lastC(p.id);
+  if(lc&&lc.peso)c.peso=lc.peso;else if(p.peso)c.peso=p.peso;
+  c.tipo=tipoAuto(p,c);const rt=retornoAuto(p,c);if(rt)c.retorno=rt;
+  S.consults.push(c);editC=c.uid;save();return c;}
+const nf1=v=>(Math.round(v*10)/10).toLocaleString('pt-BR');
+function prescr(p){const r=calc(p);const d=p.droga||drogaDe(r.trat);const o=[];
+  if((d===1||d===6)&&isNum(r.mg))o.push(`Antimoniato de meglumina ${r.dose} mg Sb+5/kg/dia: ${Math.round(r.mg).toLocaleString('pt-BR')} mg Sb+5/dia = ${nf1(r.ml)} mL (${r.amp.toLocaleString('pt-BR')} ampola${r.amp>1?'s':''} de 5 mL), EV lenta ou IM, 1 vez ao dia, por ${r.dur} dias.`);
+  if(d===6)o.push('Pentoxifilina 400 mg VO de 8/8h por 30 dias.');
+  if(d===3&&isNum(p.peso)&&/3 doses/.test(r.trat))o.push(`Isetionato de pentamidina 4 mg/kg/dose: ${Math.round(Math.min(p.peso*4,300))} mg por dose (máx. 300 mg), 3 doses, de 72/72h IM ou 48/48h EV. Paciente alimentado antes e em repouso 15 min após.`);
+  return o.join(' ');}
+function chipsQ(){return [['Sem queixas','Sem queixas.'],['Nega palpitação, zumbido, tontura','Nega palpitação, zumbido e tontura.'],['Lesão melhorando','Refere melhora da lesão.'],['Dor no local da aplicação','Refere dor no local da aplicação.']];}
+function chipsC(p,c){const r=calc(p);const L=[];const rx=prescr(p);
+  if(rx)L.push(['Prescrição calculada',()=>prescr(p)]);
+  if(c.tipo===1){L.push(['Colhido exame direto','Colhido exame direto (escarificação da borda da lesão).'],['Oferecido teste de HIV','Oferecida sorologia para HIV.'],['Notificado no SINAN','Caso notificado no SINAN.']);}
+  if(c.tipo===2||c.tipo===3){L.push(['Manter tratamento','Manter o tratamento atual.'],['Pedir exames da semana','Solicitados ECG, hemograma, ureia/creatinina, TGO/TGP/bilirrubinas e amilase/lipase (monitorização semanal).'],['Orientações','Orientado repouso relativo, não ingerir bebida alcoólica e procurar a unidade se palpitação, zumbido, tontura ou piora da lesão.']);}
+  if(r.encaminhar)L.push(['Encaminhado à referência','Encaminhado ao centro de referência.']);
+  if(c.tipo===4||c.tipo===5)L.push(['Critério de cura','Critério de cura atingido (lesão epitelizada, sem crosta e sem infiltração). Seguimento de 2 em 2 meses até 12 meses após o fim do tratamento.'],['Observar evolução','Lesão em evolução; manter observação até o próximo retorno.']);
+  L.push(['Retorno agendado',()=>c.retorno?'Retorno agendado para '+fd(c.retorno)+'.':'Retorno a agendar.']);
+  return L;}
+function chipRow(L,k){return `<div class="chips" data-chips="${k}">${L.map((x,i)=>`<button type="button" class="chip" data-i="${i}">+ ${esc(x[0])}</button>`).join('')}</div>`;}
+function bindChips(root,obj,k,L,after){const el=root.querySelector('[data-chips="'+k+'"]');if(!el)return;el.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{
+  const x=L[+b.dataset.i];const t=typeof x[1]==='function'?x[1]():x[1];if(!t)return;const cur=obj[k]||'';if(cur.includes(t)){toast('Esse texto já está no campo.');return;}
+  obj[k]=(cur?cur.replace(/\s+$/,'')+' ':'')+t;const ta=root.querySelector('textarea[data-k="'+k+'"]');if(ta){ta.value=obj[k];}after(k);});}
 
 /* ---------- views ---------- */
 const V={},AFTER={};
@@ -784,7 +867,9 @@ V.inicio=()=>{
 AFTER.inicio=()=>{bindOpen();bindVideo();const n=$('#novo');if(n)n.onclick=novoPaciente;document.querySelectorAll('[data-scroll]').forEach(a=>a.onclick=e=>{e.preventDefault();const el=document.getElementById(a.dataset.scroll);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});});};
 function bindOpen(){document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{S.sel=+b.dataset.open;save();go(b.dataset.go||'resumo');});}
 function novoPaciente(){const ids=realPatients().map(p=>p.id);const id=(ids.length?Math.max(...ids):0)+1;
-  S.patients.push({id,d1:iso(today()),created:Date.now()});S.sel=id;save();go('cadastro');toast('Paciente '+code(id)+' criado. Preencha os campos.');}
+  const prev=realPatients().slice().sort((a,b)=>(b.created||0)-(a.created||0)||b.id-a.id)[0]||{};const np={id,d1:iso(today()),sit:1,created:Date.now()};
+  ['cidade','ubs'].forEach(k=>{if(prev[k])np[k]=prev[k];});
+  S.patients.push(np);S.sel=id;save();go('cadastro');toast('Paciente '+code(id)+' criado. Comece pelo nome.');setTimeout(()=>{const n=$('#p_nome');if(n)n.focus();},60);}
 
 V.pacientes=()=>`<div><h1>Pacientes</h1><p class="lead">Toque no paciente para ver o resumo. A bolinha mostra se há alerta: verde sem alerta, amarelo atenção, vermelho contraindicação ou encaminhamento.</p></div>
   <div class="row"><input class="search" id="q" type="search" placeholder="Buscar por nome ou código" aria-label="Buscar paciente" style="flex:1 1 240px"><button class="btn pri" id="novo">${ic('plus')}Novo paciente</button></div>
@@ -799,37 +884,59 @@ AFTER.pacientes=()=>{
 V.cadastro=()=>{const p=P(S.sel);
   if(!p) return `<h1>Cadastro do paciente</h1>${picker('pk')}<div class="panel empty">Escolha um paciente ou crie um novo.<div class="row" style="justify-content:center;margin-top:10px"><button class="btn pri" id="novo">${ic('plus')}Novo paciente</button></div></div>`;
   const r=calc(p);
-  return `<div class="row" style="justify-content:space-between"><div><h1>${code(p.id)} · Cadastro</h1><p class="lead">Preencha uma vez. Toque na opção para marcar e toque de novo para desmarcar. Os resultados ao lado mudam na hora.</p></div></div>
-  ${picker('pk')}
+  return `<div class="row" style="justify-content:space-between"><div><h1>${code(p.id)} · Cadastro</h1><p class="lead">Preencha uma vez, quase tudo com toques. O que dá para deduzir o aplicativo preenche sozinho. O resultado do protocolo muda na hora.</p></div></div>
+  ${picker('pk')}${progHTML(p)}
   ${p.id===999?'<div class="box y"><b class="lbl">Exemplo</b>LT-999 é um paciente fictício para treino. Pode apagar em Dados e backup.</div>':''}
-  <div class="split"><section class="panel" id="pform">${formHTML('p',p,PF,{_idade:isNum(r.idade)?r.idade+' anos':'—'})}
-    <div class="row" style="margin-top:16px;justify-content:space-between"><a class="btn pri" href="#consulta">${ic('steth')}Registrar consulta</a><button class="btn danger sm" id="del">Excluir paciente</button></div><div id="delc"></div></section>
-   <aside class="stick panel"><h2>Resultado do protocolo</h2><div id="pres">${resultBox(p)}</div></aside></div>`;};
+  <div class="split"><section class="panel" id="pform">${formHTML('p',p,PF,{_idade:isNum(r.idade)?r.idade+' anos':'—'},{sec:{2:'<button type="button" class="btn sm quick" id="nocom">✓ Nenhuma comorbidade</button>',4:`<div id="trbtn">${trBtn(p)}</div>`}})}
+    <div class="row" style="margin-top:16px;justify-content:space-between"><button class="btn pri" id="cnova" type="button">${ic('steth')}Registrar consulta agora</button><button class="btn danger sm" id="del">Excluir paciente</button></div><div id="delc"></div></section>
+   <aside class="stick panel" id="presp"><h2>Resultado do protocolo</h2><div id="pres">${resultBox(p)}</div></aside></div>
+  <button class="fabres" id="fabres" type="button">${ic('eye')}Ver resultado</button>`;};
+function trBtn(p){const r=calc(p);if(r.semForma)return '<span class="hint">Marque a forma clínica para o aplicativo indicar o tratamento.</span>';
+  const d=drogaDe(r.trat);if(!d)return '<span class="hint">Tratamento a definir no centro de referência.</span>';
+  if(p.inicio&&p.droga)return `<span class="hint">Em tratamento desde ${fd(p.inicio)}: ${esc(lab('droga',p.droga))}.</span>`;
+  return `<button type="button" class="btn sm pri quick" id="trgo">${ic('plus')}Iniciar hoje: ${esc(lab('droga',d))}</button>`;}
 AFTER.cadastro=()=>{bindPick();const n=$('#novo');if(n){n.onclick=novoPaciente;return;}
   const p=P(S.sel);
-  bindForm($('#pform'),p,PF,(k)=>{p.updated=Date.now();save();$('#pres').innerHTML=resultBox(p);if(k==='nasc'){const r=calc(p);$('#p__idade').textContent=isNum(r.idade)?r.idade+' anos':'—';}if(k==='nome')$('#pchip').textContent=code(p.id)+' · '+(p.nome||'sem nome');});
+  const F=$('#pform');
+  const upd=(k)=>{autoP(p,k);p.updated=Date.now();save();$('#pres').innerHTML=resultBox(p);syncForm(F,p);showIf(F,pRules(p));
+    const r=calc(p);$('#p__idade').textContent=isNum(r.idade)?r.idade+' anos':'—';if(k==='nome')$('#pchip').textContent=code(p.id)+' · '+(p.nome||'sem nome');
+    const pr=$('.prog');if(pr)pr.outerHTML=progHTML(p);bindProg();$('#trbtn').innerHTML=trBtn(p);bindTr();};
+  const bindProg=()=>document.querySelectorAll('[data-sec]').forEach(a=>a.onclick=e=>{e.preventDefault();const el=document.getElementById(a.dataset.sec);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});});
+  const bindTr=()=>{const b=$('#trgo');if(b)b.onclick=()=>{const d=drogaDe(calc(p).trat);p.droga=d;if(!p.inicio)p.inicio=iso(today());if(p.sit==null||p.sit===1)p.sit=2;upd('droga');toast('Tratamento iniciado hoje. A agenda de retornos já foi montada.');};};
+  bindForm(F,p,PF,upd);showIf(F,pRules(p));bindProg();bindTr();
+  $('#nocom').onclick=()=>{['comorb','dm','imuno','qt','audit'].forEach(k=>p[k]=2);upd('comorb');toast('Marcado “Não” nas 5 comorbidades. O HIV continua para marcar.');};
+  $('#cnova').onclick=()=>{novaConsulta(p);justSaved=null;go('consulta');};
+  $('#fabres').onclick=()=>$('#presp').scrollIntoView({behavior:'smooth',block:'start'});
   $('#del').onclick=()=>{$('#delc').innerHTML=`<div class="confirm" style="margin-top:10px"><span>Excluir ${code(p.id)} e todas as consultas dele? Não dá para desfazer.</span><button class="btn danger sm" id="dely">Excluir</button><button class="btn sm" id="deln">Cancelar</button></div>`;
     $('#deln').onclick=()=>$('#delc').innerHTML='';$('#dely').onclick=()=>{S.patients=S.patients.filter(x=>x.id!==p.id);S.consults=S.consults.filter(c=>c.cod!==p.id);S.sel=null;save();toast('Paciente excluído.');go('pacientes');};};
 };
 
-let editC=null;
+let editC=null,justSaved=null;
+function soapAll(p){const t=soapText(p);return `S – SUBJETIVO\n${t.S}\n\nO – OBJETIVO\n${t.O}\n\nA – AVALIAÇÃO\n${t.A}\n\nP – PLANO\n${t.P}`;}
 V.consulta=()=>{const p=P(S.sel);
   if(!p) return `<h1>Consultas</h1>${picker('pk')}<div class="panel empty">Escolha o paciente para registrar a consulta.</div>`;
   const r=calc(p); const l=consultsOf(p.id).slice().reverse();
   const c=editC&&S.consults.find(x=>x.uid===editC&&x.cod===p.id);
-  return `<div><h1>${code(p.id)} · Consultas</h1><p class="lead">Uma consulta nova a cada atendimento: diagnóstico, cada semana de tratamento e cada retorno.</p></div>${picker('pk')}
-  ${c?`<div class="split"><section class="panel" id="cform"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Consulta de ${fd(c.data)||'data a preencher'}</h2><button class="btn sm" id="fechar">Concluir</button></div>${formHTML('c',c,CF,{_dia:diaTrat(c,p,r)||'—'})}
+  return `<div><h1>${code(p.id)} · Consultas</h1><p class="lead">Uma consulta a cada atendimento. Data, tipo, peso e retorno já vêm preenchidos; confira e marque o resto com toques.</p></div>${picker('pk')}
+  ${justSaved&&!c?`<div class="box g saved1"><b class="lbl">Consulta salva</b>Agora é só levar para o PEC.<div class="row" style="margin-top:10px"><button class="btn pri" id="cpsoap">${ic('copy')}Copiar SOAP completo</button><a class="btn" href="#soap">${ic('text')}Ver o SOAP</a></div></div>`:''}
+  ${c?`<div class="split"><section class="panel" id="cform"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2>Consulta de ${fd(c.data)||'data a preencher'}</h2><button class="btn sm" id="fechar">Concluir</button></div>${formHTML('c',c,CF,{_dia:diaTrat(c,p,r)||'—'},{sec:{1:'<span class="qrow"><button type="button" class="btn sm quick" id="exn">✓ Exames normais</button><button type="button" class="btn sm" id="exnr">Não realizados</button></span>'},after:{queixas:chipRow(chipsQ(),'queixas'),conduta:`<div id="cchips">${chipRow(chipsC(p,c),'conduta')}</div>`}})}
     <div class="row" style="margin-top:14px;justify-content:space-between"><a class="btn" href="#soap">${ic('text')}Gerar SOAP</a><button class="btn danger sm" id="cdel">Excluir consulta</button></div><div id="cdelc"></div></section>
     <aside class="stick panel"><h2>Alerta do manual</h2><div id="cal">${cAlertBox(c,p,r)}</div></aside></div>`
   :`<div class="row"><button class="btn pri" id="nova">${ic('plus')}Nova consulta</button><a class="btn" href="#resumo">${ic('eye')}Resumo antes de atender</a></div>`}
   <section class="panel"><h2>Histórico (${l.length})</h2>${l.length?`<div class="list">${l.map(x=>{const a=alertC(x,p,r);return `<button class="item" data-c="${x.uid}"><span class="code num">${fd(x.data)||'—'}</span><span class="nm">${esc(lab('tipo',x.tipo)||'Tipo não informado')}</span><span class="dot ${a.some(t=>/SUSPEN|NOTIFICAR/.test(t))?'r':a.length?'y':'g'}"></span><span class="sub">${esc(diaTrat(x,p,r)||'')}${x.conduta?' · '+esc(x.conduta.slice(0,90)):''}</span></button>`;}).join('')}</div>`:'<div class="empty">Nenhuma consulta registrada.</div>'}</section>`;};
 function cAlertBox(c,p,r){const a=alertC(c,p,r);const red=a.some(t=>/SUSPEN|NOTIFICAR/.test(t));return `<div class="box ${red?'r':a.length?'y':'g'}"><b class="lbl">${red?'Atenção':a.length?'Alerta':'Sem alerta'}</b>${alertList(a,'Nenhum alerta para os dados desta consulta.')}</div>`;}
 AFTER.consulta=()=>{bindPick();const p=P(S.sel);if(!p)return;
-  const n=$('#nova');if(n)n.onclick=()=>{const c={uid:Date.now(),cod:p.id,data:iso(today())};const lc=lastC(p.id);if(lc&&lc.peso)c.peso=lc.peso;else if(p.peso)c.peso=p.peso;S.consults.push(c);editC=c.uid;save();render();};
-  document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{editC=+b.dataset.c;render();window.scrollTo(0,0);});
+  const n=$('#nova');if(n)n.onclick=()=>{novaConsulta(p);justSaved=null;render();};
+  const cs=$('#cpsoap');if(cs)cs.onclick=()=>copy(soapAll(p),cs);
+  document.querySelectorAll('[data-c]').forEach(b=>b.onclick=()=>{editC=+b.dataset.c;justSaved=null;render();window.scrollTo(0,0);});
   const f=$('#cform');if(!f)return;const c=S.consults.find(x=>x.uid===editC);
-  bindForm(f,c,CF,(k)=>{save();const r=calc(p);$('#cal').innerHTML=cAlertBox(c,p,r);$('#c__dia').textContent=diaTrat(c,p,r)||'—';});
-  $('#fechar').onclick=()=>{editC=null;render();toast('Consulta salva.');};
+  const cupd=(k)=>{if(k==='data'&&c.data){c.tipo=tipoAuto(p,c);const rt=retornoAuto(p,c);if(rt)c.retorno=rt;}
+    save();const r=calc(p);$('#cal').innerHTML=cAlertBox(c,p,r);$('#c__dia').textContent=diaTrat(c,p,r)||'—';syncForm(f,c);
+    if(k==='data'||k==='tipo'){$('#cchips').innerHTML=chipRow(chipsC(p,c),'conduta');bindChips(f,c,'conduta',chipsC(p,c),cupd);}};
+  bindForm(f,c,CF,cupd);bindChips(f,c,'queixas',chipsQ(),cupd);bindChips(f,c,'conduta',chipsC(p,c),cupd);
+  $('#exn').onclick=()=>{Object.assign(c,{ausc:1,ecg:1,ur:1,tgo:1,ami:1,hemo:1,aud:2});cupd('exn');toast('Monitorização marcada como normal.');};
+  $('#exnr').onclick=()=>{Object.assign(c,{ecg:4,ur:4,tgo:4,ami:4,hemo:3});cupd('exnr');toast('Exames marcados como não realizados.');};
+  $('#fechar').onclick=()=>{editC=null;justSaved=c.uid;render();window.scrollTo(0,0);toast('Consulta salva.');};
   $('#cdel').onclick=()=>{$('#cdelc').innerHTML=`<div class="confirm" style="margin-top:10px"><span>Excluir esta consulta?</span><button class="btn danger sm" id="cdy">Excluir</button><button class="btn sm" id="cdn">Cancelar</button></div>`;
     $('#cdn').onclick=()=>$('#cdelc').innerHTML='';$('#cdy').onclick=()=>{S.consults=S.consults.filter(x=>x.uid!==c.uid);editC=null;save();render();};};
 };
@@ -853,8 +960,8 @@ V.resumo=()=>{const p=P(S.sel);
   <div class="grid2"><section class="panel"><h2>Última consulta</h2>${lc?`<dl class="kv num">${kv('Data',fd(lc.data))}${kv('Tipo',esc(lab('tipo',lc.tipo)))}${kv('Momento',esc(diaTrat(lc,p,r)))}${kv('Conduta',esc(lc.conduta))}${kv('Próximo retorno marcado',fd(lc.retorno))}</dl>`:'<div class="empty">Nenhuma consulta registrada.</div>'}</section>
    <section class="panel"><h2>Alerta da última consulta</h2>${lc?alertList(la,'Sem alerta.'):'—'}</section></div>
   <section class="panel"><h2>O que fazer nesta consulta</h2><p style="margin:0">${p.sit?pg(TODO[p.sit-1]):'Preencha a situação do paciente no cadastro.'}</p></section>
-  <div class="row noprint"><a class="btn pri" href="#consulta">${ic('steth')}Registrar consulta</a><a class="btn" href="#cadastro">${ic('file')}Editar cadastro</a></div>`;};
-AFTER.resumo=bindPick;
+  <div class="row noprint"><button class="btn pri" id="rnova">${ic('plus')}Nova consulta agora</button><a class="btn" href="#cadastro">${ic('file')}Editar cadastro</a></div>`;};
+AFTER.resumo=()=>{bindPick();const b=$('#rnova');if(b)b.onclick=()=>{novaConsulta(P(S.sel));justSaved=null;go('consulta');};};
 
 let avulso={peso:null,idade:null,modo:'pac'};
 V.dose=()=>{const p=avulso.modo==='pac'?P(S.sel):null;let ctx,head;
@@ -921,11 +1028,11 @@ V.soap=()=>{const p=P(S.sel);
   const t=soapText(p);const blk=(k,n)=>`<div class="sb"><header><b>${n}</b><button class="btn sm" data-copy="${k}">${ic('copy')}Copiar</button></header><pre id="s_${k}">${esc(t[k])}</pre></div>`;
   const ca=t.c?alertC(t.c,p,t.r):[];
   return `<div><h1>Texto SOAP para o PEC</h1><p class="lead">Junta o cadastro e a última consulta (${t.c?fd(t.c.data):'sem consulta registrada: usando só o cadastro'}). Copie cada bloco e cole no campo do PEC. Dado não preenchido aparece como “não informado”.</p></div>${picker('pk')}
+  <div class="row"><button class="btn pri" data-copy="ALL">${ic('copy')}Copiar tudo de uma vez</button><span class="hint">ou copie bloco por bloco abaixo</span></div>
   <div class="soap">${blk('S','S – Subjetivo')}${blk('O','O – Objetivo')}${blk('A','A – Avaliação')}${blk('P','P – Plano')}</div>
-  <div class="row"><button class="btn pri" data-copy="ALL">${ic('copy')}Copiar tudo</button></div>
   <section class="panel"><h2>Para sua revisão (não colar no PEC)</h2>${alertList(ca.concat(t.r.alertas))}</section>`;};
 AFTER.soap=()=>{bindPick();const p=P(S.sel);if(!p)return;const t=soapText(p);
-  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{const k=b.dataset.copy;copy(k==='ALL'?`S – SUBJETIVO\n${t.S}\n\nO – OBJETIVO\n${t.O}\n\nA – AVALIAÇÃO\n${t.A}\n\nP – PLANO\n${t.P}`:t[k],b);});};
+  document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{const k=b.dataset.copy;copy(k==='ALL'?soapAll(p):t[k],b);});};
 
 V.ficha=()=>{const p=P(S.sel);
   if(!p) return `<h1>Ficha do paciente</h1>${picker('pk')}<div class="panel empty">Escolha o paciente.</div>`;
