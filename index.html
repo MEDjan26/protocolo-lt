@@ -336,6 +336,7 @@ tr.soon td{background:var(--warn-soft)}
 .saved1{animation:pop .35s ease}
 @keyframes pop{from{transform:translateY(-6px);opacity:0}to{transform:none;opacity:1}}
 @media (max-width:600px){.top .saved{display:none}}
+@media (max-width:480px){.top{gap:8px}.brand{flex:none}.brand b{white-space:nowrap}.brand span{display:none}.pchip{max-width:28vw;min-width:0}.ttop{flex:none}}
 
 </style>
 <script>window.LT_SW=true;</script>
@@ -834,8 +835,8 @@ function bindChips(root,obj,k,L,after){const el=root.querySelector('[data-chips=
 const V={},AFTER={};
 function videoBlock(id){
   return `<div class="vid" id="${id}"><video id="${id}_v" playsinline preload="none" poster="tutorial-capa.jpg"><source src="tutorial.mp4" type="video/mp4"></video>
-    <button class="vplay" type="button" data-vplay="${id}" aria-label="Assistir ao tutorial"><span class="vbtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg></span><span class="vtxt"><b>Assistir ao tutorial</b><small>4 min 53 s · com narração</small></span></button></div>
-    <p class="hint vfall">Se o vídeo não carregar, <a href="${DRIVE}" target="_blank" rel="noopener">abra pelo Google Drive</a>.</p>`;
+    <button class="vplay" type="button" data-vplay="${id}" aria-label="Assistir ao tutorial"><span class="vbtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg></span><span class="vtxt"><b>Assistir ao tutorial</b><small>4 min 25 s · com narração</small></span></button></div>
+    <p class="hint vfall">Se o vídeo não carregar aqui, <a href="tutorial.mp4" target="_blank" rel="noopener">abra o vídeo em outra aba</a>.</p>`;
 }
 function bindVideo(){document.querySelectorAll('[data-vplay]').forEach(b=>b.onclick=()=>{const v=document.getElementById(b.dataset.vplay+'_v');b.hidden=true;v.controls=true;try{const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}
   try{localStorage.setItem('protocoloLT.viu','1');}catch(e){} });
@@ -847,9 +848,9 @@ V.inicio=()=>{
   S.patients.forEach(p=>{const r=calc(p);if(r.prox&&r.prox<=addD(t,14))soon.push([p,r.prox]);});
   soon.sort((a,b)=>a[1]-b[1]);
   const steps=[['1','Suspeita','lesão ≥3 semanas','protocolo'],['2','Exame','direto / Montenegro','cadastro'],['3','Notificação','SINAN','cadastro'],['4','Tratamento','calculadora','dose'],['5','Seguimento','agenda de retornos','agenda'],['6','Alta','critério de cura','consulta']];
-  const start=[['play','Assista ao vídeo','5 minutos, explica tudo','#tutorial'],['plus','Cadastre o paciente','uma vez, com botões','novo'],['steth','Registre a consulta','a cada atendimento','#consulta'],['text','Copie o SOAP','e cole no PEC','#soap']];
+  const start=[['play','Assista ao vídeo','4 minutos, explica tudo','#tutorial'],['plus','Cadastre o paciente','uma vez, com botões','novo'],['steth','Registre a consulta','a cada atendimento','#consulta'],['text','Copie o SOAP','e cole no PEC','#soap']];
   return `<section class="hero"><img src="${CONTENT.icon}" alt="Ícone do Protocolo LT"><div class="t"><div class="eyebrow">Protocolo digital</div><h1>Leishmaniose tegumentar, do diagnóstico à alta</h1><p>Manual de Vigilância da Leishmaniose Tegumentar (Ministério da Saúde, 2017) · Edjan S. Santos, Interno de Medicina UFAC, Turma 30 · Internato Rural, Feijó (AC)</p></div></section>
-  <section class="tut" id="tutorial"><div class="tut-h"><span class="tag">Comece por aqui</span><h2>Primeira vez? Assista ao tutorial antes de usar</h2><p>Em 5 minutos o vídeo mostra cada parte do protocolo: cadastro, consultas, dose, SOAP, ficha e agenda. As telas do aplicativo seguem os mesmos passos.</p></div>${videoBlock('vh')}</section>
+  <section class="tut" id="tutorial"><div class="tut-h"><span class="tag">Comece por aqui</span><h2>Primeira vez? Assista ao tutorial antes de usar</h2><p>Em 4 minutos o vídeo mostra o aplicativo do início ao fim: instalar, cadastrar o paciente, registrar a consulta, copiar o SOAP para o PEC e acompanhar os retornos.</p></div>${videoBlock('vh')}</section>
   <section class="panel"><h2>Como usar em 4 passos</h2><div class="go">${start.map((x,i)=>x[3]==='novo'?`<button class="gostep" id="novo" type="button"><span class="gn">${i+1}</span>${ic(x[0])}<b>${x[1]}</b><small>${x[2]}</small></button>`:`<a class="gostep" href="${x[3]}" ${x[3]==='#tutorial'?'data-scroll="tutorial"':''}><span class="gn">${i+1}</span>${ic(x[0])}<b>${x[1]}</b><small>${x[2]}</small></a>`).join('')}</div>
     <p class="hint" style="margin:12px 0 0">Tudo o que você digita é salvo na hora, neste aparelho. Os dados dos pacientes não vão para a internet.</p></section>
   <section class="panel"><h2>Painel da unidade</h2><div class="stats">
@@ -1073,12 +1074,13 @@ V.legenda=()=>{const g={};CONTENT.legenda.forEach(r=>{const k=r[0]+'|'+r[1];(g[k
 V.referencias=()=>`<div><h1>Referências</h1></div><div class="card-k">${CONTENT.referencias.slice(0,3).map(r=>`<div><b>${esc(r[0])}</b><span>${esc(r[1])}</span></div>`).join('')}</div>
   <h2>Onde está no manual</h2><div class="tw"><table><thead><tr><th>Assunto</th><th>Página(s)</th></tr></thead><tbody>${CONTENT.referencias.slice(4).filter(r=>r[2]&&r[0]!=='Assunto').map(r=>`<tr><td>${esc(r[0])}</td><td class="d">${esc(r[2])}</td></tr>`).join('')}</tbody></table></div>
   <p class="hint">Versão do aplicativo 1.0 · novembro de 2026 · mesmas regras da planilha LT-Protocolo-Digital-Santos-2026.</p>`;
-V.ajuda=()=>`<div><h1>Como usar</h1><p class="lead">O aplicativo faz o mesmo que a planilha, com botões no lugar dos números.</p></div>
-  <section class="tut"><div class="tut-h"><span class="tag">Vídeo tutorial</span><h2>Aprenda em 5 minutos</h2><p>O vídeo mostra o protocolo passo a passo. As telas do aplicativo seguem os mesmos passos.</p></div>${videoBlock('va')}</section>
+V.ajuda=()=>`<div><h1>Como usar</h1><p class="lead">Quase tudo é marcado com toques. O que dá para deduzir, o aplicativo preenche sozinho.</p></div>
+  <section class="tut"><div class="tut-h"><span class="tag">Vídeo tutorial</span><h2>Aprenda em 4 minutos</h2><p>O vídeo mostra o aplicativo do início ao fim, com um paciente fictício.</p></div>${videoBlock('va')}</section>
   <section class="panel prose"><h2>Passo a passo com paciente novo</h2>
-   <p><b>1. Pacientes › Novo paciente.</b> O código (LT-001, LT-002…) sai sozinho. Preencha o cadastro uma vez. O quadro “Resultado do protocolo” mostra tratamento, dose, encaminhamento e alertas na hora.</p>
-   <p><b>2. Consultas › Nova consulta</b> a cada atendimento. O quadro “Alerta do manual” avisa quando suspender, notificar reação, indicar 2º esquema ou dar critério de cura.</p>
-   <p><b>3. Texto SOAP:</b> copie cada bloco e cole no PEC.</p>
+   <p><b>1. Novo paciente.</b> O código (LT-001, LT-002…), a data de hoje, a cidade e a unidade do último cadastro já vêm preenchidos. Digite nome, nascimento e peso; o resto é com toques. “Nenhuma comorbidade” responde 5 perguntas de uma vez. O quadro “Resultado do protocolo” mostra tratamento, dose, encaminhamento e alertas na hora.</p>
+   <p><b>Início do tratamento:</b> o botão “Iniciar hoje” registra o remédio indicado, a data de início e a situação, e monta a agenda.</p>
+   <p><b>2. Registrar consulta agora</b> a cada atendimento. Data, tipo, peso e próximo retorno vêm prontos. Use os atalhos de queixas, “Exames normais” e “Prescrição calculada”. O quadro “Alerta do manual” avisa quando suspender, notificar reação, indicar 2º esquema ou dar critério de cura.</p>
+   <p><b>3. SOAP:</b> ao concluir a consulta, toque em “Copiar SOAP completo” e cole no PEC.</p>
    <p><b>4. Ficha (PDF):</b> imprima ou salve em PDF para referência, preceptor ou vigilância.</p>
    <p><b>5. Agenda:</b> exames semanais durante o tratamento e retornos até a alta, calculados sozinhos.</p></section>
   <section class="panel prose"><h2>Instalar como aplicativo</h2>
@@ -1116,7 +1118,7 @@ V.mais=()=>`<h1>Mais</h1><button class="btn pri" id="mtut" type="button" style="
 
 function openTut(){let m=$('#tutm');if(m)m.remove();m=document.createElement('div');m.id='tutm';m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label','Tutorial em vídeo');
   const first=!seen();
-  m.innerHTML=`<div class="sheet"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${first?'Bem-vindo':'Tutorial'}</span><h2 style="margin-top:6px">${first?'Antes de começar, assista ao tutorial':'Tutorial em vídeo'}</h2><p class="lead" style="margin-top:4px">Em 5 minutos você aprende a cadastrar, registrar consultas, calcular a dose, copiar o SOAP e imprimir a ficha.</p></div><button class="btn sm" id="tutx" type="button" aria-label="Fechar">Fechar</button></div>${videoBlock('vm')}<div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn pri" id="tutok" type="button">${first?'Já assisti, começar':'Voltar ao aplicativo'}</button></div></div>`;
+  m.innerHTML=`<div class="sheet"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${first?'Bem-vindo':'Tutorial'}</span><h2 style="margin-top:6px">${first?'Antes de começar, assista ao tutorial':'Tutorial em vídeo'}</h2><p class="lead" style="margin-top:4px">Em 4 minutos você aprende a instalar, cadastrar o paciente, registrar a consulta, calcular a dose e copiar o SOAP para o PEC.</p></div><button class="btn sm" id="tutx" type="button" aria-label="Fechar">Fechar</button></div>${videoBlock('vm')}<div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn pri" id="tutok" type="button">${first?'Já assisti, começar':'Voltar ao aplicativo'}</button></div></div>`;
   document.body.appendChild(m);bindVideo();const close=()=>{try{localStorage.setItem('protocoloLT.viu','1');}catch(e){}const v=m.querySelector('video');if(v)v.pause();m.remove();};
   $('#tutx').onclick=close;$('#tutok').onclick=close;m.onclick=e=>{if(e.target===m)close();};document.addEventListener('keydown',function k(e){if(e.key==='Escape'){close();document.removeEventListener('keydown',k);}});$('#tutx').focus();}
 function seen(){try{return localStorage.getItem('protocoloLT.viu')==='1';}catch(e){return true;}}
