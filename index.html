@@ -835,7 +835,7 @@ function bindChips(root,obj,k,L,after){const el=root.querySelector('[data-chips=
 const V={},AFTER={};
 function videoBlock(id){
   return `<div class="vid" id="${id}"><video id="${id}_v" playsinline preload="none" poster="tutorial-capa.jpg"><source src="tutorial.mp4" type="video/mp4"></video>
-    <button class="vplay" type="button" data-vplay="${id}" aria-label="Assistir ao tutorial"><span class="vbtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg></span><span class="vtxt"><b>Assistir ao tutorial</b><small>4 min 25 s · com narração</small></span></button></div>
+    <button class="vplay" type="button" data-vplay="${id}" aria-label="Assistir ao tutorial"><span class="vbtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg></span><span class="vtxt"><b>Assistir ao tutorial</b><small>4 min 31 s · com narração</small></span></button></div>
     <p class="hint vfall">Se o vídeo não carregar aqui, <a href="tutorial.mp4" target="_blank" rel="noopener">abra o vídeo em outra aba</a>.</p>`;
 }
 function bindVideo(){document.querySelectorAll('[data-vplay]').forEach(b=>b.onclick=()=>{const v=document.getElementById(b.dataset.vplay+'_v');b.hidden=true;v.controls=true;try{const p=v.play();if(p&&p.catch)p.catch(()=>{});}catch(e){}
