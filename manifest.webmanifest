@@ -1,6 +1,6 @@
 {
- "name": "Protocolo LT – Leishmaniose Tegumentar",
- "short_name": "Protocolo LT",
+ "name": "Protocolo Leishmaniose Tegumentar",
+ "short_name": "Protocolo Leishmaniose Tegumentar",
  "lang": "pt-BR",
  "description": "Protocolo digital de leishmaniose tegumentar (Manual MS 2017): cadastro, consultas, dose, SOAP, ficha e agenda.",
  "start_url": "./",

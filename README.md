@@ -1,4 +1,4 @@
-# Protocolo LT
+# Protocolo Leishmaniose Tegumentar
 
 Aplicativo do protocolo digital de leishmaniose tegumentar, baseado no Manual de Vigilância da Leishmaniose Tegumentar (Ministério da Saúde, 2017).
 
