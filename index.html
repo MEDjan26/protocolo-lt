@@ -338,6 +338,14 @@ tr.soon td{background:var(--warn-soft)}
 @media (max-width:600px){.top .saved{display:none}}
 @media (max-width:480px){.top{gap:8px}.brand{flex:none}.brand b{white-space:nowrap}.brand span{display:none}.pchip{max-width:28vw;min-width:0}.ttop{flex:none}}
 
+.tinst{display:inline-flex;align-items:center;gap:6px;background:#1F9D6B;color:#fff;border:0;border-radius:999px;padding:6px 12px 6px 8px;font-weight:700;font-size:.82rem;cursor:pointer;min-height:34px}
+.tinst svg{width:20px;height:20px;stroke:#fff}
+.tinst:hover{filter:brightness(1.08)}
+.tinst[hidden],.instb[hidden]{display:none!important}
+.instb{background:#1F9D6B!important;color:#fff!important;border-color:#1F9D6B!important}
+.instb svg{stroke:#fff}
+@media (max-width:480px){.tinst span{display:none}.tinst{padding:6px;flex:none}}
+
 </style>
 <script>window.LT_SW=true;</script>
 </head><body>
@@ -657,6 +665,7 @@ async function copy(txt,btn){try{await navigator.clipboard.writeText(txt);toast(
 
 /* ícones */
 const IC={
+ dl:'<path d="M12 4v11"/><path d="M7 10l5 5 5-5"/><path d="M5 20h14"/>',
  home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
  users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 010 7M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/>',
  steth:'<path d="M6 3v6a4 4 0 008 0V3"/><path d="M10 13v2a5 5 0 0010 0v-2"/><circle cx="20" cy="11" r="2"/>',
@@ -698,6 +707,7 @@ function shell(){
     <img src="${CONTENT.icon}" alt="">
     <div class="brand"><b>Protocolo LT</b><span>Leishmaniose tegumentar</span></div>
     <div class="sp"></div><span class="saved" id="saved">✓ salvo</span>
+    <button class="tinst" id="tinst" type="button" hidden>${ic('dl')}<span>Instalar</span></button>
     <button class="ttop" id="ttop" type="button">${ic('play')}<span>Tutorial</span></button>
     <button class="pchip" id="pchip" type="button"></button>
   </header>
@@ -706,7 +716,7 @@ function shell(){
     <main id="main"></main>
   </div>
   <nav class="tabs" aria-label="Atalhos">${TABS.map(x=>`<a href="#${x[0]}" data-v="${x[0]}">${ic(x[2])}${x[1]}</a>`).join('')}</nav>`;
-  $('#pchip').onclick=()=>go('pacientes');$('#ttop').onclick=openTut;
+  $('#pchip').onclick=()=>go('pacientes');$('#ttop').onclick=openTut;$('#tinst').onclick=doInstall;instUI();
 }
 function render(){
   const v=view();
@@ -1086,7 +1096,7 @@ V.ajuda=()=>`<div><h1>Como usar</h1><p class="lead">Quase tudo é marcado com to
   <section class="panel prose"><h2>Instalar como aplicativo</h2>
    <p><b>Celular Android (Chrome):</b> abra o link, toque nos três pontinhos › “Adicionar à tela inicial” ou “Instalar app”.</p>
    <p><b>iPhone (Safari):</b> toque em Compartilhar › “Adicionar à Tela de Início”.</p>
-   <p><b>Notebook (Chrome ou Edge):</b> clique no ícone de instalar na barra de endereço, ou menu › “Instalar Protocolo LT”.</p>
+   <p><b>Notebook (Chrome ou Edge):</b> clique no ícone de instalar na barra de endereço, ou no botão verde “Instalar” no topo do aplicativo.</p>
    <p>Depois de instalado, abre pelo ícone e funciona sem internet.</p></section>
   <section class="panel prose"><h2>Privacidade (LGPD)</h2>
    <p>Os dados ficam só no aparelho em que foram digitados. Nada é enviado para servidor. Cada médico tem os próprios pacientes no próprio celular ou notebook.</p>
@@ -1118,9 +1128,23 @@ V.mais=()=>`<h1>Mais</h1><button class="btn pri" id="mtut" type="button" style="
 
 function openTut(){let m=$('#tutm');if(m)m.remove();m=document.createElement('div');m.id='tutm';m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');m.setAttribute('aria-label','Tutorial em vídeo');
   const first=!seen();
-  m.innerHTML=`<div class="sheet"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${first?'Bem-vindo':'Tutorial'}</span><h2 style="margin-top:6px">${first?'Antes de começar, assista ao tutorial':'Tutorial em vídeo'}</h2><p class="lead" style="margin-top:4px">Em 4 minutos você aprende a instalar, cadastrar o paciente, registrar a consulta, calcular a dose e copiar o SOAP para o PEC.</p></div><button class="btn sm" id="tutx" type="button" aria-label="Fechar">Fechar</button></div>${videoBlock('vm')}<div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn pri" id="tutok" type="button">${first?'Já assisti, começar':'Voltar ao aplicativo'}</button></div></div>`;
+  m.innerHTML=`<div class="sheet"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><span class="tag">${first?'Bem-vindo':'Tutorial'}</span><h2 style="margin-top:6px">${first?'Antes de começar, assista ao tutorial':'Tutorial em vídeo'}</h2><p class="lead" style="margin-top:4px">Em 4 minutos você aprende a instalar, cadastrar o paciente, registrar a consulta, calcular a dose e copiar o SOAP para o PEC.</p></div><button class="btn sm" id="tutx" type="button" aria-label="Fechar">Fechar</button></div>${videoBlock('vm')}<div class="row" style="justify-content:flex-end;margin-top:12px;gap:8px;flex-wrap:wrap"><button class="btn instb" type="button" data-inst ${canInst()?'':'hidden'}>${ic('dl')}Instalar no aparelho</button><button class="btn pri" id="tutok" type="button">${first?'Já assisti, começar':'Voltar ao aplicativo'}</button></div></div>`;
   document.body.appendChild(m);bindVideo();const close=()=>{try{localStorage.setItem('protocoloLT.viu','1');}catch(e){}const v=m.querySelector('video');if(v)v.pause();m.remove();};
-  $('#tutx').onclick=close;$('#tutok').onclick=close;m.onclick=e=>{if(e.target===m)close();};document.addEventListener('keydown',function k(e){if(e.key==='Escape'){close();document.removeEventListener('keydown',k);}});$('#tutx').focus();}
+  $('#tutx').onclick=close;$('#tutok').onclick=close;m.querySelectorAll('[data-inst]').forEach(b=>b.onclick=doInstall);m.onclick=e=>{if(e.target===m)close();};document.addEventListener('keydown',function k(e){if(e.key==='Escape'){close();document.removeEventListener('keydown',k);}});$('#tutx').focus();}
+/* ---------- instalar com 1 clique ---------- */
+let DPR=null;
+const isStandalone=()=>{try{return matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;}catch(e){return false;}};
+const isIOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+function canInst(){return !isStandalone()&&(!!DPR||isIOS());}
+function instUI(){const on=canInst();const b=document.getElementById('tinst');if(b)b.hidden=!on;document.querySelectorAll('[data-inst]').forEach(x=>x.hidden=!on);}
+async function doInstall(){
+  if(DPR){const e=DPR;DPR=null;try{e.prompt();await e.userChoice;}catch(_){}instUI();return;}
+  if(isIOS()){let m=$('#instm');if(m)m.remove();m=document.createElement('div');m.id='instm';m.className='modal';m.setAttribute('role','dialog');m.setAttribute('aria-modal','true');
+    m.innerHTML=`<div class="sheet"><h2>Instalar no iPhone</h2><p class="lead" style="margin:8px 0 14px">1. Toque em <b>Compartilhar</b> (quadrado com seta, embaixo da tela).<br>2. Toque em <b>Adicionar à Tela de Início</b>.</p><div class="row" style="justify-content:flex-end"><button class="btn pri" type="button" id="instok">Entendi</button></div></div>`;
+    document.body.appendChild(m);const c=()=>m.remove();$('#instok').onclick=c;m.onclick=e=>{if(e.target===m)c();};return;}
+  go('ajuda');}
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();DPR=e;instUI();});
+window.addEventListener('appinstalled',()=>{DPR=null;instUI();});
 function seen(){try{return localStorage.getItem('protocoloLT.viu')==='1';}catch(e){return true;}}
 AFTER.mais=()=>{$('#mtut').onclick=openTut;};
 /* ---------- início ---------- */
