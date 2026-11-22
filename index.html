@@ -346,6 +346,30 @@ tr.soon td{background:var(--warn-soft)}
 .instb svg{stroke:#fff}
 @media (max-width:480px){.tinst span{display:none}.tinst{padding:6px;flex:none}}
 
+/* acesso */
+.auth{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:radial-gradient(900px 600px at 85% -10%,#0E5A6B 0%,transparent 60%),radial-gradient(700px 500px at -10% 110%,#0B4A58 0%,transparent 60%),var(--head)}
+.acard{width:min(440px,100%);background:var(--surface);color:var(--fg);border-radius:16px;padding:24px;border:2px solid #C9A227;box-shadow:0 24px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;gap:14px}
+.ahead{display:flex;align-items:center;gap:12px}
+.ahead img{width:56px;height:56px;border-radius:13px;flex:none}
+.ahead b{font-family:var(--font-d);font-size:1.05rem;line-height:1.2;display:block}
+.ahead .eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.acard h1{font-size:1.35rem}
+.acard .lead{margin:0;color:var(--muted)}
+.acard .hint{margin:0;font-size:.82rem;color:var(--muted)}
+.btn.wide{width:100%;justify-content:center;min-height:46px;font-size:1rem}
+.aerr{background:var(--bad-soft);color:var(--fg);border:1px solid color-mix(in srgb,var(--bad) 35%,transparent);border-radius:8px;padding:8px 12px;font-size:.9rem}
+.aerr[hidden]{display:none}
+.tlock{background:transparent;color:var(--head-fg);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:5px 12px;font-weight:700;font-size:.82rem;cursor:pointer;min-height:34px}
+.tlock:hover{background:rgba(255,255,255,.1)}
+.tlock[hidden]{display:none}
+.uform{margin-top:12px;display:flex;flex-direction:column;gap:10px;max-width:420px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface2)}
+.tblw{overflow:auto;max-height:420px;border:1px solid var(--line);border-radius:8px}
+.tbl{width:100%;border-collapse:collapse;font-size:.85rem}
+.tbl th,.tbl td{text-align:left;padding:6px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl th{position:sticky;top:0;background:var(--surface2);font-weight:700}
+.tbl td:first-child,.tbl td:nth-child(2){white-space:nowrap}
+@media (max-width:480px){.tlock{padding:5px 9px}}
+
 </style>
 <script>window.LT_SW=true;</script>
 </head><body>
@@ -641,11 +665,11 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const pg=s=>esc(s).replace(/\[(p\.[^\]]+)\]/g,'<span class="pg">[$1]</span>');
 
-function load(){try{const t=localStorage.getItem(KEY);if(t){const d=JSON.parse(t);S=Object.assign(S,d);}}catch(e){}
+function load(){if(!A.key&&!A.demo)try{const t=localStorage.getItem(KEY);if(t){const d=JSON.parse(t);S=Object.assign(S,d);}}catch(e){}
   if(!S.seeded&&!S.patients.length){seed();}
 }
 let saveT=null;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));flashSaved();}catch(e){toast('Não foi possível salvar neste navegador. Exporte um backup em Dados.');}}
+function save(){if(A.demo){flashSaved();return;}if(A.key){authSave();flashSaved();return;}try{localStorage.setItem(KEY,JSON.stringify(S));flashSaved();}catch(e){toast('Não foi possível salvar neste navegador. Exporte um backup em Dados.');}}
 function flashSaved(){const el=$('#saved');if(!el)return;el.classList.add('on');clearTimeout(saveT);saveT=setTimeout(()=>el.classList.remove('on'),1400);}
 function seed(){
   const ex=CONTENT.ex;
@@ -710,13 +734,14 @@ function shell(){
     <button class="tinst" id="tinst" type="button" hidden>${ic('dl')}<span>Instalar</span></button>
     <button class="ttop" id="ttop" type="button">${ic('play')}<span>Tutorial</span></button>
     <button class="pchip" id="pchip" type="button"></button>
+    <button class="tlock" id="tlock" type="button" ${A.key?'':'hidden'} aria-label="Sair">Sair</button>
   </header>
   <div class="shell">
     <nav class="side" aria-label="Menu">${NAV.map(g=>`<div class="grp">${g[0]}</div>`+g[1].map(x=>`<a href="#${x[0]}" data-v="${x[0]}">${ic(x[2])}${x[1]}</a>`).join('')).join('')}</nav>
     <main id="main"></main>
   </div>
   <nav class="tabs" aria-label="Atalhos">${TABS.map(x=>`<a href="#${x[0]}" data-v="${x[0]}">${ic(x[2])}${x[1]}</a>`).join('')}</nav>`;
-  $('#pchip').onclick=()=>go('pacientes');$('#ttop').onclick=openTut;$('#tinst').onclick=doInstall;instUI();
+  $('#pchip').onclick=()=>go('pacientes');$('#ttop').onclick=openTut;$('#tinst').onclick=doInstall;$('#tlock').onclick=()=>lockApp('Saiu');instUI();
 }
 function render(){
   const v=view();
@@ -1111,8 +1136,8 @@ V.dados=()=>{const n=realPatients().length;let used='';try{used=Math.round((loca
   <section class="panel prose"><h2>Exportar para Excel</h2><p>Gera um arquivo .xlsx com as abas PACIENTES e CONSULTAS, com as respostas em número (para estatística) e por extenso.</p><div class="row"><button class="btn pri" id="xl">${ic('down')}Baixar Excel</button></div></section>
   <section class="panel prose"><h2>Backup</h2><p>Salve o backup no Drive ou mande para você mesmo. Para passar os dados para outro aparelho, importe este arquivo lá.</p><div class="row"><button class="btn" id="bk">${ic('down')}Baixar backup</button><label class="btn" for="imp">${ic('up')}Importar backup</label><input id="imp" type="file" accept=".json,application/json" hidden></div></section>
   <section class="panel prose"><h2>Trazer pacientes da planilha</h2><p>Escolha o arquivo LT-Protocolo-Digital-Santos-2026.xlsx. Os pacientes e consultas das abas PACIENTES e CONSULTAS são copiados para este aparelho. A planilha não é alterada.</p><div class="row"><label class="btn" for="ixl">${ic('up')}Escolher planilha</label><input id="ixl" type="file" accept=".xlsx,.xlsm" hidden></div><div id="ixlr"></div></section>
-  <section class="panel prose"><h2>Paciente exemplo</h2><p>LT-999 é fictício e serve para treinar.</p><div class="row">${P(999)?'<button class="btn danger sm" id="dex">Apagar LT-999</button>':'<button class="btn sm" id="rex">Recolocar LT-999</button>'}</div></section>`;};
-AFTER.dados=()=>{
+  <section class="panel prose"><h2>Paciente exemplo</h2><p>LT-999 é fictício e serve para treinar.</p><div class="row">${P(999)?'<button class="btn danger sm" id="dex">Apagar LT-999</button>':'<button class="btn sm" id="rex">Recolocar LT-999</button>'}</div></section>${accessHTML()}`;};
+AFTER.dados=()=>{bindAccess();
   $('#xl').onclick=()=>{try{download('Protocolo-LT-'+iso(today())+'.xlsx',buildXlsx(),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');}catch(e){toast('Não foi possível gerar o Excel: '+e.message);}};
   $('#bk').onclick=()=>download('Protocolo-LT-backup-'+iso(today())+'.json',new TextEncoder().encode(JSON.stringify({app:'Protocolo LT',v:1,patients:S.patients,consults:S.consults},null,1)),'application/json');
   $('#imp').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d.patients))throw new Error('arquivo não é backup do Protocolo LT');const r=merge(d.patients,d.consults||[]);save();toast(`Importado: ${r.np} paciente(s), ${r.nc} consulta(s).`);render();}catch(err){toast('Backup inválido: '+err.message);}};
@@ -1154,7 +1179,138 @@ function boot(){load();shell();window.addEventListener('hashchange',()=>{editC=e
   try{if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&window.LT_SW)navigator.serviceWorker.register('sw.js').catch(()=>{});}catch(e){}
 }
 
+/* ===== Acesso: CPF + senha (4 primeiros números do CPF). Serve para identificar e registrar tudo por CPF; dados guardados cifrados neste aparelho ===== */
+const VKEY='protocoloLT.vault', IDLE_MIN=15, PIT=210000;
+const A={demo:false,vault:null,key:null,cpf:'',log:[],prev:null,fails:0,until:0,view:''};
+const te=new TextEncoder(), td=new TextDecoder();
+function b64e(buf){const u=new Uint8Array(buf);let s='';for(let i=0;i<u.length;i+=0x8000)s+=String.fromCharCode.apply(null,u.subarray(i,i+0x8000));return btoa(s);}
+function b64d(s){const b=atob(s),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u;}
+const rnd=n=>crypto.getRandomValues(new Uint8Array(n));
+const cpfDig=s=>String(s||'').replace(/\D/g,'').slice(0,11);
+function cpfOk(c){c=cpfDig(c);if(c.length!==11||/^(\d)\1+$/.test(c))return false;for(const t of [9,10]){let s=0;for(let i=0;i<t;i++)s+=+c[i]*(t+1-i);if((s*10)%11%10!==+c[t])return false;}return true;}
+function cpfFmt(c){c=cpfDig(c);let o=c.slice(0,3);if(c.length>3)o+='.'+c.slice(3,6);if(c.length>6)o+='.'+c.slice(6,9);if(c.length>9)o+='-'+c.slice(9);return o;}
+async function kdf(secret,salt,it){const m=await crypto.subtle.importKey('raw',te.encode(secret),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:it,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);}
+async function aenc(key,bytes){const iv=rnd(12);return {iv:b64e(iv),ct:b64e(await crypto.subtle.encrypt({name:'AES-GCM',iv},key,bytes))};}
+async function adec(key,o){return new Uint8Array(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(o.iv)},key,b64d(o.ct)));}
+async function sha(s){return b64e(await crypto.subtle.digest('SHA-256',te.encode(s)));}
+async function wrapFor(secret,raw){const salt=rnd(16);return {salt:b64e(salt),it:PIT,w:await aenc(await kdf(secret,salt,PIT),raw)};}
+async function unwrapWith(secret,r){return adec(await kdf(secret,b64d(r.salt),r.it),r.w);}
+const dkey=raw=>crypto.subtle.importKey('raw',raw,{name:'AES-GCM'},false,['encrypt','decrypt']);
+function nowStr(){const d=new Date(),z=n=>String(n).padStart(2,'0');return `${z(d.getDate())}/${z(d.getMonth()+1)}/${d.getFullYear()} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`;}
+const ltId=id=>'LT-'+String(id).padStart(3,'0');
+const brDate=s=>s?String(s).split('-').reverse().join('/'):'';
 
-boot();
+/* ---------- gravação e registro ---------- */
+let AQ=Promise.resolve();
+function aq(fn){AQ=AQ.then(fn).catch(e=>{console.error(e);toast('Erro ao salvar: '+e.message);});return AQ;}
+async function persist(){
+  const P={S:{patients:S.patients,consults:S.consults,sel:S.sel,seeded:S.seeded},log:A.log};
+  A.vault.data=await aenc(A.key,te.encode(JSON.stringify(P)));
+  localStorage.setItem(VKEY,JSON.stringify(A.vault));
+}
+async function addLog(ev){
+  const last=A.log[A.log.length-1],cpf=A.cpf,t=nowStr();
+  if(last&&last.ev===ev&&last.cpf===cpf&&/^Alterou/.test(ev)&&last.t.slice(0,16)===t.slice(0,16))return; // mesma edição no mesmo minuto
+  const e={t,cpf,ev};e.h=await sha((last?last.h:'')+'|'+t+'|'+cpf+'|'+ev);A.log.push(e);
+}
+function logNow(ev){if(!A.key)return Promise.resolve();return aq(async()=>{await addLog(ev);await persist();});}
+function snap(){const m={p:{},c:{},sel:S.sel};S.patients.forEach(p=>m.p[p.id]=JSON.stringify(p));S.consults.forEach(c=>m.c[c.uid]=JSON.stringify(c));return m;}
+function diffEvents(a,b){
+  const ev=[],cl=c=>{try{const o=JSON.parse(c);return ltId(o.cod)+(o.data?', '+brDate(o.data):'');}catch(e){return '';}};
+  for(const k in b.p){if(!(k in a.p))ev.push('Cadastrou o paciente '+ltId(k));else if(a.p[k]!==b.p[k])ev.push('Alterou o cadastro do paciente '+ltId(k));}
+  for(const k in a.p)if(!(k in b.p))ev.push('Apagou o paciente '+ltId(k));
+  for(const k in b.c){if(!(k in a.c))ev.push('Registrou consulta ('+cl(b.c[k])+')');else if(a.c[k]!==b.c[k])ev.push('Alterou consulta ('+cl(b.c[k])+')');}
+  for(const k in a.c)if(!(k in b.c))ev.push('Apagou consulta ('+cl(a.c[k])+')');
+  if(b.sel!=null&&b.sel!==a.sel&&(b.sel in b.p))ev.unshift('Abriu o paciente '+ltId(b.sel));
+  return ev;
+}
+let flushT=null;
+function authSave(){clearTimeout(flushT);flushT=setTimeout(flushNow,500);}
+function flushNow(){clearTimeout(flushT);return aq(async()=>{const b=snap();if(A.prev)for(const e of diffEvents(A.prev,b))await addLog(e);A.prev=b;await persist();});}
+function curPat(){return S.sel!=null&&P(S.sel)?' (paciente '+ltId(S.sel)+')':'';}
+function curView(){const v=(location.hash||'#inicio').slice(1).split('?')[0]||'inicio';return TITLES[v]||v;}
+
+/* ---------- telas de acesso ---------- */
+function authShell(inner){document.getElementById('app').innerHTML=`<div class="auth"><div class="acard"><div class="ahead"><img src="${CONTENT.icon}" alt=""><div><div class="eyebrow">Protocolo digital</div><b>Protocolo Leishmaniose Tegumentar</b></div></div>${inner}</div></div>`;}
+const fld=(id,lb,type,ac,ph)=>`<div class="f"><label for="${id}">${lb}</label><input id="${id}" type="${type==='cpf'?'text':type}" ${type==='cpf'?'inputmode="numeric" maxlength="14"':''} autocomplete="${ac}" ${ph?`placeholder="${ph}"`:''}></div>`;
+function err(m){const e=document.getElementById('aerr');if(e){e.textContent=m||'';e.hidden=!m;}}
+function busy(b,on,txt){b.disabled=on;if(on){b.dataset.t=b.textContent;b.textContent=txt||'Aguarde…';}else if(b.dataset.t)b.textContent=b.dataset.t;}
+function maskCpf(el){el.addEventListener('input',()=>{el.value=cpfFmt(el.value);});}
+function onEnter(ids,btn){ids.forEach(i=>{const e=document.getElementById(i);e&&e.addEventListener('keydown',ev=>{if(ev.key==='Enter')btn.click();});});}
+function pwOk(p1,p2){if((p1||'').length<6)return 'A senha precisa ter pelo menos 6 caracteres.';if(p1!==p2)return 'As duas senhas não são iguais.';return '';}
+
+function loginView(){
+  authShell(`<h1>Entrar</h1><p class="lead">Digite seu CPF e a senha.</p>
+   ${fld('acpf','CPF','cpf','username','000.000.000-00')}${fld('apw','Senha: os 4 primeiros números do seu CPF','password','current-password')}
+   <div class="aerr" id="aerr" role="alert" hidden></div>
+   <button class="btn pri wide" id="ago" type="button">Entrar</button>
+   <p class="hint">Tudo o que for feito no aplicativo fica registrado no CPF de quem entrou, com dia e hora.</p>`);
+  const c=$('#acpf');maskCpf(c);c.focus();const pw=$('#apw');pw.setAttribute('inputmode','numeric');pw.setAttribute('maxlength','4');const b=$('#ago');onEnter(['acpf','apw'],b);
+  b.onclick=async()=>{if(Date.now()<A.until)return err('Muitas tentativas. Aguarde 30 segundos.');
+    const cpf=cpfDig(c.value);if(!cpfOk(cpf))return err('CPF inválido. Confira os números.');
+    if(pw.value!==cpf.slice(0,4)){if(++A.fails>=5){A.fails=0;A.until=Date.now()+30000;}return err('Senha incorreta. A senha são os 4 primeiros números do seu CPF.');}
+    err('');busy(b,true,'Entrando…');
+    try{A.cpf=cpf;
+      if(!A.vault){let legacy=null;try{const t=localStorage.getItem(KEY);if(t)legacy=JSON.parse(t);}catch(e){}
+        const raw=rnd(32);A.vault={v:3,k:b64e(raw),data:null};A.key=await dkey(raw);A.log=[];
+        if(legacy)S=Object.assign(S,legacy);else seed();
+        await addLog('Primeiro acesso neste aparelho');await addLog('Entrou');await persist();try{localStorage.removeItem(KEY);}catch(e){}
+      }else{A.key=await dkey(b64d(A.vault.k));const P=JSON.parse(td.decode(await adec(A.key,A.vault.data)));
+        S=Object.assign({patients:[],consults:[],sel:null,seeded:false},P.S||{});A.log=P.log||[];await logNow('Entrou');}
+      enterApp();}catch(e){busy(b,false);A.key=null;err('Não foi possível abrir os dados ('+e.message+').');}};
+}
+function enterApp(){A.prev=snap();A.view='';hookAudit();boot();startIdle();}
+function lockApp(reason){clearTimeout(flushT);const done=()=>{try{location.reload();}catch(e){}};if(!A.key)return done();
+  aq(async()=>{const b=snap();if(A.prev)for(const e of diffEvents(A.prev,b))await addLog(e);A.prev=b;await addLog(reason||'Saiu');await persist();}).then(done,done);}
+let idleT=null;
+function startIdle(){const r=()=>{clearTimeout(idleT);idleT=setTimeout(()=>lockApp('Saiu: bloqueio automático após '+IDLE_MIN+' min sem uso'),IDLE_MIN*60000);};
+  ['pointerdown','keydown','touchstart','wheel'].forEach(e=>document.addEventListener(e,r,{passive:true}));r();
+  window.addEventListener('pagehide',()=>{if(A.key)flushNow();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&A.key)flushNow();});}
+
+/* ---------- rastreio: telas, impressões, cópias, arquivos, importações ---------- */
+let hooked=false;
+function hookAudit(){
+  if(hooked)return;hooked=true;
+  const logView=()=>{const v=curView();if(v!==A.view){A.view=v;logNow('Abriu a tela '+v+curPat());}};
+  window.addEventListener('hashchange',()=>setTimeout(logView,0));setTimeout(logView,0);
+  window.addEventListener('beforeprint',()=>logNow('Imprimiu ou salvou em PDF: '+curView()+curPat()));
+  document.addEventListener('copy',()=>logNow('Copiou texto da tela '+curView()+curPat()));
+  const oCopy=copy;copy=function(txt,btn){logNow('Copiou '+(btn&&btn.textContent?'"'+btn.textContent.trim().slice(0,40)+'"':'texto')+' da tela '+curView()+curPat());return oCopy.apply(this,arguments);};
+  const oDl=download;download=function(name){logNow('Baixou o arquivo '+name);return oDl.apply(this,arguments);};
+  const oMg=merge;merge=function(ps,cs){const r=oMg.apply(this,arguments);logNow(`Importou ${r&&r.np!=null?r.np:'?'} paciente(s) e ${r&&r.nc!=null?r.nc:'?'} consulta(s) de arquivo`);return r;};
+}
+
+/* ---------- tela Dados e backup: senha e histórico ---------- */
+async function verifyLog(){let h='';for(const e of A.log){const x=await sha(h+'|'+e.t+'|'+e.cpf+'|'+e.ev);if(x!==e.h)return false;h=x;}return true;}
+function logRows(q){q=cpfDig(q);const L=A.log.filter(e=>!q||e.cpf.includes(q));return {n:L.length,html:L.slice(-500).reverse().map(e=>`<tr><td class="num">${esc(e.t)}</td><td class="num">${esc(cpfFmt(e.cpf))}</td><td>${esc(e.ev)}</td></tr>`).join('')};}
+function accessHTML(){
+  if(!A.key)return '';const r=logRows('');
+  return `<section class="panel prose" id="acc"><h2>Acesso</h2>
+   <p>Você entrou com o CPF <b class="num">${esc(cpfFmt(A.cpf))}</b>. Cada profissional entra com o próprio CPF, e tudo fica registrado nele.</p>
+   <div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn" id="ulock" type="button">Sair</button></div></section>
+  <section class="panel prose"><h2>Histórico de acessos</h2>
+   <p>Fica registrado, por CPF, com dia e hora: entrada e saída, telas abertas, pacientes abertos, cadastros, consultas, alterações, exclusões, cópias, impressões, arquivos baixados e importados.</p>
+   <p id="loginteg" class="hint">Conferindo o registro…</p>
+   <div class="f" style="max-width:260px;margin-bottom:8px"><label for="lq">Filtrar por CPF</label><input id="lq" type="text" inputmode="numeric" placeholder="digite o CPF"></div>
+   <div class="tblw"><table class="tbl"><thead><tr><th>Data e hora</th><th>CPF</th><th>O que fez</th></tr></thead><tbody id="lrows">${r.html}</tbody></table></div>
+   <p class="hint" id="lcount">${r.n} registro(s)${r.n>500?' (mostrando os 500 mais recentes)':''}.</p></section>`;
+}
+function bindAccess(){
+  if(!A.key||!$('#acc'))return;
+  verifyLog().then(ok=>{const e=$('#loginteg');if(e){e.textContent=ok?'Registro íntegro: nenhuma alteração feita fora do aplicativo.':'ATENÇÃO: o registro de acessos foi alterado fora do aplicativo.';e.className=ok?'box g':'box r';}});
+  const lq=$('#lq');maskCpf(lq);lq.addEventListener('input',()=>{const r=logRows(lq.value);$('#lrows').innerHTML=r.html;$('#lcount').textContent=r.n+' registro(s)'+(r.n>500?' (mostrando os 500 mais recentes)':'')+'.';});
+  $('#ulock').onclick=()=>lockApp('Saiu');
+}
+
+/* ---------- início ---------- */
+function authStart(){
+  if(/[?&]demo=1\b/.test(location.search)){A.demo=true;boot();return;}
+  if(!(window.crypto&&crypto.subtle)){boot();return;}
+  let v=null;try{v=JSON.parse(localStorage.getItem(VKEY)||'null');}catch(e){}
+  A.vault=v&&v.k&&v.data?v:null;loginView();
+}
+
+
+authStart();
 </script>
 </body></html>
